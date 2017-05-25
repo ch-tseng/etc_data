@@ -83,7 +83,7 @@ def getData(nowTime, type):
 def loadCSV(path, savename, replaceDate):
 
     if(os.path.exists('lastM03A.csv')):
-        df1 = pd.read_csv('lastM03A.csv', names=['TimeInterval', 'Direction', 'VehicleType', 'Gantry', 'area', 'country', 'way', 'Traffic'])
+        df1 = pd.read_csv('lastM03A.csv', names=['TimeInterval', 'Direction', 'VehicleType', 'area', 'country', 'way', 'Traffic'])
         print("df1........................................")
         print(df1)
 
@@ -109,25 +109,27 @@ def loadCSV(path, savename, replaceDate):
 
     df2['Traffic'] = df2['traffic']
     df2.drop('traffic', axis=1, inplace=True)
+    df2.drop('Gantry', axis=1, inplace=True)
 
     print("df2........................................")
     print(df2)
 
     if(os.path.exists('lastM03A.csv')):
-        df3 = pd.merge(left=df1,right=df2, how='outer')
-        #df1.append(df2, ignore_index=True)
+        #df3 = pd.merge(left=df1,right=df2, how='outer')
+        df3 = df2.append(df1, ignore_index=True)
+        #df3 = pd.concat([df1,df2])
         print("df3........................................")
         print(df3)
 
         #df4 = df1.groupby(['TimeInterval', 'Direction', 'VehicleType', 'Gantry', 'area', 'country', 'way'], as_index=False).sum()
-        df3.groupby(['TimeInterval', 'Direction', 'VehicleType', 'Gantry', 'area', 'country', 'way'])[["Traffic"]].sum()
+        df4 = df3.groupby(['TimeInterval', 'Direction', 'VehicleType', 'area', 'country', 'way'],sort=False)[["Traffic"]].sum().reset_index()
 
         print("df4........................................")
-        print(df3)
+        print(df4)
 
-        print("Total: {}".format(df3["Traffic"].sum()))
+        print("Total: {}".format(df4["Traffic"].sum()))
 
-        df3.to_csv("lastM03A.csv", index=False, header=False)
+        df4.to_csv("lastM03A.csv", index=False, header=False)
 
     else:
         df2.to_csv("lastM03A.csv", index=False, header=False)
